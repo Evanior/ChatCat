@@ -52,13 +52,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
 
-        Uri contructionURI = Uri.parse("http://jsonplaceholder.typicode.com").buildUpon().appendPath("posts").build();
-
-        try {
-            URL urlFinal = new URL(contructionURI.toString());
-        }catch (MalformedURLException error){
-            error.printStackTrace();
-        }
+        Uri contructionURI = Uri.parse("http://10.2.6.30:8080").buildUpon().appendPath("ChatCat").build();
 
         AsyncTask downloadNewPosts = new AsyncTask<URL, Integer, String>(){
             @Override
@@ -76,11 +70,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             protected void onPostExecute(String s) {
-                Toast.makeText(getApplicationContext(), "msg : "+ s, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
                 super.onPostExecute(s);
             }
         };
-        downloadNewPosts.execute();
+
+        try {
+            URL urlFinal = new URL(contructionURI.toString());
+            URL[] urls = {urlFinal};
+            downloadNewPosts.execute(urls);
+        }catch (MalformedURLException error){
+            error.printStackTrace();
+        }
     }
 
     @Override
