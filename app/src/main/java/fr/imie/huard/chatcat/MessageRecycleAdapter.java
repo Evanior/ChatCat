@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 /**
@@ -19,10 +21,7 @@ public class MessageRecycleAdapter extends RecyclerView.Adapter<MessageRecycleAd
     private ArrayList<Message> mesMessages;
 
     public MessageRecycleAdapter() {
-    }
-
-    public MessageRecycleAdapter(ArrayList<Message> tm) {
-        mesMessages = tm;
+        mesMessages = new ArrayList<>();
     }
 
     public void addMessages(Message m){
@@ -74,9 +73,11 @@ public class MessageRecycleAdapter extends RecyclerView.Adapter<MessageRecycleAd
         }
 
         void bind(int listIndex){
-            pseudo.setText(String.valueOf(listIndex));
-            date.setText("");
-            message.setText("");
+            Message leMessage = mesMessages.get(listIndex);
+            DateFormat dateFormater = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+            pseudo.setText(leMessage.getPseudo());
+            date.setText(dateFormater.format(leMessage.getDate()));
+            message.setText(leMessage.getMessage());
             imgprofil.setImageResource(R.mipmap.ic_launcher);
         }
     }

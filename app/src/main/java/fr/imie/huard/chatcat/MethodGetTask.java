@@ -53,9 +53,9 @@ public class MethodGetTask extends AsyncTask<URL, Integer, String> {
                 }*/
                 DateFormat dateFormater = new SimpleDateFormat("dd/MM/yyyy hh:mm");
                 Message m = new Message(msg.getLong("id"),msg.getString("pseudo"),dateFormater.parse(msg.getString("date")),msg.getString("message"));
-                activity.getAdapter().add(m);
+                activity.getAdapterRecyclable().addMessages(m);
             }
-            activity.getListView().setAdapter(activity.getAdapter());
+            activity.getListRecyclable().setAdapter(activity.getAdapterRecyclable());
         }catch (JSONException jsonError){
             jsonError.printStackTrace();
         }catch (ParseException p){

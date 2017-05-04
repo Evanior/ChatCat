@@ -160,8 +160,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void refresh(){
-        adapter.clear();
-        listView.setAdapter(adapter);
+        //adapter.clear();
+        //listView.setAdapter(adapter);
+        adapterRecyclable.getMesMessages().clear();
+        listRecyclable.setAdapter(adapterRecyclable);
         Uri contructionURI = Uri.parse("http://10.2.6.30:8080").buildUpon()
                 .appendPath("ChatCat").appendPath("message").build();
 
