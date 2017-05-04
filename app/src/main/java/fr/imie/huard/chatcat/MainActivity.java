@@ -5,15 +5,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
-
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,12 +24,18 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
 
+import static fr.imie.huard.chatcat.R.id.fab;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     //private CoordinatorLayout coordinatorLayout;
-    private RequestQueue queue = Volley.newRequestQueue(this);
+    //private RequestQueue queue = Volley.newRequestQueue(this);
     private MessageAdapter<Message> adapter;
     private ListView listView;
+
+    private RecyclerView listRecyclable;
+    private MessageRecycleAdapter adapterRecyclable;
+
     private EditText editText;
     private AsyncTask downloadNewPosts;
 
@@ -46,12 +51,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         editText = (EditText) findViewById(R.id.edit);
 
-        listView = (ListView) findViewById(R.id.list);
-        if(adapter == null){
-            adapter = new MessageAdapter<>(this);
-        }
+        /*listView = (ListView) findViewById(R.id.list);
+        adapter = new MessageAdapter<Message>(this);
 
-        listView.setAdapter(adapter);
+        listView.setAdapter(adapter);*/
+
+        listRecyclable = (RecyclerView) findViewById(R.id.list);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        listRecyclable.setLayoutManager(linearLayoutManager);
+
+        listRecyclable.setHasFixedSize(false);
+        adapterRecyclable = new MessageRecycleAdapter();
+        listRecyclable.setAdapter(adapterRecyclable);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
@@ -101,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         int id = view.getId();
         switch (id) {
-            case R.id.fab:
+            case fab:
                 /*adapter.add(editText.getText().toString());
                 listView.setAdapter(adapter);
                 editText.setText("");*/
@@ -126,12 +137,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @Deprecated
     public ListView getListView() {
         return listView;
     }
 
+    @Deprecated
     public MessageAdapter<Message> getAdapter() {
         return adapter;
+    }
+
+    public RecyclerView getListRecyclable() {
+        return listRecyclable;
+    }
+
+    public MessageRecycleAdapter getAdapterRecyclable() {
+        return adapterRecyclable;
     }
 
     public EditText getEditText() {
@@ -154,6 +175,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             error.printStackTrace();
         }
     }
+
+    public static String MethodResponseFromHttpUrl(URL url, String methode) throws IOException {
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.setRequestMethod(methode);
+        try {
+            InputStream in = urlConnection.getInputStream();
+
+            Scanner scanner = new Scanner(in);
+            scanner.useDelimiter("\\A");
+
+            boolean hasInput = scanner.hasNext();
+            if (hasInput) {
+                return scanner.next();
+            } else {
+                return null;
+            }
+        } finally {
+            urlConnection.disconnect();
+        }
+    }
+
 
     public static String getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();

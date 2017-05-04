@@ -52,7 +52,7 @@ public class MethodGetTask extends AsyncTask<URL, Integer, String> {
                     //Toast.makeText(activity.getApplicationContext(), msg.getString(key), Toast.LENGTH_SHORT).show();
                 }*/
                 DateFormat dateFormater = new SimpleDateFormat("dd/MM/yyyy hh:mm");
-                Message m = new Message(msg.getString("pseudo"),dateFormater.parse(msg.getString("date")),msg.getString("message"));
+                Message m = new Message(msg.getLong("id"),msg.getString("pseudo"),dateFormater.parse(msg.getString("date")),msg.getString("message"));
                 activity.getAdapter().add(m);
             }
             activity.getListView().setAdapter(activity.getAdapter());

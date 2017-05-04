@@ -22,7 +22,8 @@ public class MethodPostTask extends AsyncTask<URL, Integer, String> {
     protected String doInBackground(URL... params) {
         for (URL u : params) {
             try {
-                return MainActivity.postResponseFromHttpUrl(u);
+                String s = MainActivity.postResponseFromHttpUrl(u);
+                return s; //MainActivity.postResponseFromHttpUrl(u);
             }catch (IOException e){
                 e.printStackTrace();
                 return "error";
@@ -33,7 +34,7 @@ public class MethodPostTask extends AsyncTask<URL, Integer, String> {
 
     @Override
     protected void onPostExecute(String s) {
-        activity.refresh();// FIXME: 04/05/2017 
+        activity.refresh();// FIXME: 04/05/2017
         super.onPostExecute(s);
     }
 }

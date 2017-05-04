@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
  * Created by huard.cdi04 on 04/05/2017.
  */
 
+@Deprecated
 public class MessageAdapter<Object> extends ArrayAdapter {
 
     private static LayoutInflater inflater = null;
