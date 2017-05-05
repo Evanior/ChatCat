@@ -9,12 +9,12 @@ import java.net.URL;
  * Created by huard.cdi04 on 04/05/2017.
  */
 
-public class MethodPostTask extends AsyncTask<URL, Integer, String> {
+public class MethodTask extends AsyncTask<URL, Integer, String> {
 
     private MainActivity activity;
     private String methode;
 
-    public MethodPostTask(MainActivity activity, String methode) {
+    public MethodTask(MainActivity activity, String methode) {
         super();
         this.activity = activity;
         this.methode = methode;

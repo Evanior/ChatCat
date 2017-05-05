@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .appendQueryParameter("message",editText.getText().toString()).build();
                 editText.setText("");
 
-                downloadNewPosts = new MethodPostTask(this);
+                downloadNewPosts = new MethodTask(this, "POST");
 
                 try {
                     URL urlFinal = new URL(contructionURI.toString());
@@ -159,6 +159,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return editText;
     }
 
+    /**
+     * permet de rechager la list
+     */
     public void refresh(){
         //adapter.clear();
         //listView.setAdapter(adapter);
@@ -178,6 +181,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    /**
+     * Permet d'envoyer des requetes a un serveur
+     * @param url du serveur
+     * @param methode chaine de charactère pour selectionner la méthode
+     * <UL>
+     *  <LI>GET
+     *  <LI>POST
+     *  <LI>HEAD
+     *  <LI>OPTIONS
+     *  <LI>PUT
+     *  <LI>DELETE
+     *  <LI>TRACE
+     * </UL> sont légal
+     * @return la reponse du serveur
+     * @throws IOException
+     */
     public static String methodResponseFromHttpUrl(URL url, String methode) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setRequestMethod(methode);
