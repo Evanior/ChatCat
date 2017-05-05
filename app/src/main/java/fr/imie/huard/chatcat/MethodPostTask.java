@@ -22,8 +22,8 @@ public class MethodPostTask extends AsyncTask<URL, Integer, String> {
     protected String doInBackground(URL... params) {
         for (URL u : params) {
             try {
-                String s = MainActivity.postResponseFromHttpUrl(u);
-                return s; //MainActivity.postResponseFromHttpUrl(u);
+                String s = MainActivity.methodResponseFromHttpUrl(u,"POST");
+                return s;
             }catch (IOException e){
                 e.printStackTrace();
                 return "error";

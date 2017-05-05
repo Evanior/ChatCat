@@ -30,7 +30,7 @@ public class MethodGetTask extends AsyncTask<URL, Integer, String> {
     protected String doInBackground(URL... params) {
         for (URL u : params) {
             try {
-                return MainActivity.getResponseFromHttpUrl(u);
+                return MainActivity.methodResponseFromHttpUrl(u,"GET");
             }catch (IOException e){
                 e.printStackTrace();
                 return "error";
