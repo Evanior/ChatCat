@@ -12,17 +12,19 @@ import java.net.URL;
 public class MethodPostTask extends AsyncTask<URL, Integer, String> {
 
     private MainActivity activity;
+    private String methode;
 
-    public MethodPostTask(MainActivity activity) {
+    public MethodPostTask(MainActivity activity, String methode) {
         super();
         this.activity = activity;
+        this.methode = methode;
     }
 
     @Override
     protected String doInBackground(URL... params) {
         for (URL u : params) {
             try {
-                String s = MainActivity.methodResponseFromHttpUrl(u,"POST");
+                String s = MainActivity.methodResponseFromHttpUrl(u,methode);
                 return s;
             }catch (IOException e){
                 e.printStackTrace();
