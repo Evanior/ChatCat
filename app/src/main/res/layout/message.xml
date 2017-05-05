@@ -66,5 +66,15 @@
         app:srcCompat="@mipmap/ic_launcher"
         android:layout_alignParentTop="true" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/linearLayout2"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:background="@color/colorText" />
+
 
 </RelativeLayout>
