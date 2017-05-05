@@ -11,7 +11,6 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Iterator;
 
 /**
  * Created by huard.cdi04 on 04/05/2017.
@@ -45,15 +44,10 @@ public class MethodGetTask extends AsyncTask<URL, Integer, String> {
             JSONArray tablMessage = new JSONArray(s);
             for (int i = 0; i < tablMessage.length(); i++) {
                 JSONObject msg = tablMessage.getJSONObject(i);
-                Iterator<?> keys = msg.keys();
-                /*while (keys.hasNext()){
-                    String key = (String) keys.next();
-                    Message m = new Message()
-                    //Toast.makeText(activity.getApplicationContext(), msg.getString(key), Toast.LENGTH_SHORT).show();
-                }*/
-                DateFormat dateFormater = new SimpleDateFormat("dd/MM/yyyy hh:mm");
-                Message m = new Message(msg.getLong("id"),msg.getString("pseudo"),dateFormater.parse(msg.getString("date")),msg.getString("message"));
+                DateFormat dateFormater = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                Message m = new Message(msg.getLong("id"), msg.getString("pseudo"), dateFormater.parse(msg.getString("date")), msg.getString("message"));
                 activity.getAdapterRecyclable().addMessages(m);
+                activity.getAdapterRecyclable().notifyDataSetChanged();
             }
             activity.getListRecyclable().setAdapter(activity.getAdapterRecyclable());
         }catch (JSONException jsonError){
@@ -61,7 +55,7 @@ public class MethodGetTask extends AsyncTask<URL, Integer, String> {
         }catch (ParseException p){
             p.printStackTrace();
         }
-        //Toast.makeText(activity.getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+        activity.getListRecyclable().scrollToPosition(activity.getAdapterRecyclable().getItemCount());
         super.onPostExecute(s);
     }
 }

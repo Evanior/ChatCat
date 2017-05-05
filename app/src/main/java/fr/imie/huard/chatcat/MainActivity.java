@@ -8,21 +8,33 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import static fr.imie.huard.chatcat.R.id.fab;
 
@@ -113,22 +125,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int id = view.getId();
         switch (id) {
             case fab:
-                /*adapter.add(editText.getText().toString());
-                listView.setAdapter(adapter);
-                editText.setText("");*/
-                DateFormat dateFormater = new SimpleDateFormat("dd/MM/yyyy hh:mm");
-                Uri contructionURI = Uri.parse("http://10.2.6.30:8080").buildUpon()
+                DateFormat dateFormater = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                /*Uri contructionURI = Uri.parse("http://10.2.6.30:8080").buildUpon()
                         .appendPath("ChatCat").appendPath("message")
                         .appendQueryParameter("pseudo","Tim")
                         .appendQueryParameter("date",dateFormater.format(new Date()))
-                        .appendQueryParameter("message",editText.getText().toString()).build();
-                editText.setText("");
+                        .appendQueryParameter("message",editText.getText().toString()).build();*/
+                Uri contructionURI = Uri.parse("http://10.2.6.30:8080").buildUpon()
+                        .appendPath("ChatCat").appendPath("message").build();
 
-                downloadNewPosts = new MethodTask(this, "POST");
+                HashMap<String,String> parametre = new HashMap<>();
+                parametre.put("pseudo", "Tim");
+                parametre.put("message",editText.getText().toString());
+                parametre.put("date", dateFormater.format(new Date()));
+
+                downloadNewPosts = new MethodTask(this, "POST", parametre);
+
+                //((MethodTask)downloadNewPosts).setParametre(parametre);
+
+                editText.setText("");
 
                 try {
                     URL urlFinal = new URL(contructionURI.toString());
                     URL[] urls = {urlFinal};
+                    Log.i("url", urlFinal.toString());
                     downloadNewPosts.execute(urls);
                 }catch (MalformedURLException error){
                     error.printStackTrace();
@@ -217,45 +237,62 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    @Deprecated
-    public static String getResponseFromHttpUrl(URL url) throws IOException {
-        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+    public static String  performPostCall(URL url, String method,
+                                          HashMap<String, String> postDataParams) {
+
+        //URL url;
+        String response = "";
         try {
-            InputStream in = urlConnection.getInputStream();
+            //url = new URL(requestURL);
 
-            Scanner scanner = new Scanner(in);
-            scanner.useDelimiter("\\A");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
-            boolean hasInput = scanner.hasNext();
-            if (hasInput) {
-                return scanner.next();
-            } else {
-                return null;
+            conn.setReadTimeout(15000);
+            conn.setConnectTimeout(15000);
+            conn.setRequestMethod(method);
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+
+            OutputStream os = conn.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(
+                    new OutputStreamWriter(os, "UTF-8"));
+            writer.write(getPostDataString(postDataParams));
+
+            writer.flush();
+            writer.close();
+            os.close();
+            int responseCode=conn.getResponseCode();
+
+            if (responseCode == HttpsURLConnection.HTTP_OK) {
+                String line;
+                BufferedReader br=new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                while ((line=br.readLine()) != null) {
+                    response+=line;
+                }
             }
-        } finally {
-            urlConnection.disconnect();
+            else {
+                response="";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        return response;
     }
 
-    @Deprecated
-    public static String postResponseFromHttpUrl(URL url) throws IOException {
-        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-        urlConnection.setRequestMethod("POST");
-        try {
-            InputStream in = urlConnection.getInputStream();
+    public static String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+        for(Map.Entry<String, String> entry : params.entrySet()){
+            if (first)
+                first = false;
+            else
+                result.append("&");
 
-            Scanner scanner = new Scanner(in);
-            scanner.useDelimiter("\\A");
-
-            boolean hasInput = scanner.hasNext();
-            if (hasInput) {
-                return scanner.next();
-            } else {
-                return null;
-            }
-        } finally {
-            urlConnection.disconnect();
+            result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+            result.append("=");
+            result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
         }
+        return result.toString();
     }
 }
 

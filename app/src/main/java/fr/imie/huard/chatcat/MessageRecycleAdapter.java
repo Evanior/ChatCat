@@ -11,6 +11,7 @@ import android.widget.TextView;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by huard.cdi04 on 04/05/2017.
@@ -74,7 +75,14 @@ public class MessageRecycleAdapter extends RecyclerView.Adapter<MessageRecycleAd
 
         void bind(int listIndex){
             Message leMessage = mesMessages.get(listIndex);
-            DateFormat dateFormater = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+            DateFormat dateFormater = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+            //Log.i("myTag",(new Date().getTime() - leMessage.getDate().getTime())+"");
+            if((new Date().getTime() - leMessage.getDate().getTime()) < 24*60*60*1000){
+                dateFormater = new SimpleDateFormat("HH:mm");
+            }/*else if((new Date().getTime() - leMessage.getDate().getTime()) < 24*60*60*7*1000){
+                dateFormater = new SimpleDateFormat("dd/MM/yyyy");
+            }*/
+
             pseudo.setText(leMessage.getPseudo());
             date.setText(dateFormater.format(leMessage.getDate()));
             message.setText(leMessage.getMessage());
