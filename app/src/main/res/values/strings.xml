@@ -7,4 +7,5 @@
     <string name="action_search">Search</string>
     <string name="action_delete">Delete</string>
     <string name="action_refresh">Refresh</string>
+    <string name="app_url" translatable="false">http://10.2.6.30:8080</string>
 </resources>

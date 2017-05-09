@@ -64,7 +64,7 @@ public class MethodTask extends AsyncTask<URL, Integer, String> {
             Message m = new Message(msg.getLong("id"), msg.getString("pseudo"), dateFormater.parse(msg.getString("date")), msg.getString("message"));
             activity.getAdapterRecyclable().addMessages(m);
             activity.getAdapterRecyclable().notifyDataSetChanged();
-            activity.getListRecyclable().setAdapter(activity.getAdapterRecyclable());
+            activity.getListRecyclable().scrollToPosition(activity.getAdapterRecyclable().getItemCount()+1);
         }catch (JSONException jsonError){
             jsonError.printStackTrace();
         }catch (ParseException p){

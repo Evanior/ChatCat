@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -70,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         listRecyclable = (RecyclerView) findViewById(R.id.list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setStackFromEnd(true);
         listRecyclable.setLayoutManager(linearLayoutManager);
 
         listRecyclable.setHasFixedSize(false);
@@ -78,6 +80,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
+
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                adapterRecyclable.removeMessage(((MessageRecycleAdapter.MessageHolder) viewHolder).getIndex());
+                adapterRecyclable.notifyItemRemoved(((MessageRecycleAdapter.MessageHolder) viewHolder).getIndex());
+                deleteOneMessage(((MessageRecycleAdapter.MessageHolder) viewHolder).getId());
+            }
+        };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(listRecyclable);
 
         refresh();
     }
@@ -186,11 +205,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //adapter.clear();
         //listView.setAdapter(adapter);
         adapterRecyclable.getMesMessages().clear();
-        listRecyclable.setAdapter(adapterRecyclable);
+        adapterRecyclable.notifyDataSetChanged();
         Uri contructionURI = Uri.parse("http://10.2.6.30:8080").buildUpon()
                 .appendPath("ChatCat").appendPath("message").build();
 
         downloadNewPosts = new MethodGetTask(this);
+
+        try {
+            URL urlFinal = new URL(contructionURI.toString());
+            URL[] urls = {urlFinal};
+            downloadNewPosts.execute(urls);
+        }catch (MalformedURLException error){
+            error.printStackTrace();
+        }
+    }
+
+    public void deleteOneMessage(long id){
+        Uri contructionURI = Uri.parse("http://10.2.6.30:8080").buildUpon()
+                .appendPath("ChatCat").appendPath("message")
+                .appendPath(""+id).build();
+
+        downloadNewPosts = new MethodTask(this,"DELETE");
 
         try {
             URL urlFinal = new URL(contructionURI.toString());

@@ -49,7 +49,6 @@ public class MethodGetTask extends AsyncTask<URL, Integer, String> {
                 activity.getAdapterRecyclable().addMessages(m);
                 activity.getAdapterRecyclable().notifyDataSetChanged();
             }
-            activity.getListRecyclable().setAdapter(activity.getAdapterRecyclable());
         }catch (JSONException jsonError){
             jsonError.printStackTrace();
         }catch (ParseException p){

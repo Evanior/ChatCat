@@ -29,6 +29,10 @@ public class MessageRecycleAdapter extends RecyclerView.Adapter<MessageRecycleAd
         mesMessages.add(m);
     }
 
+    public void removeMessage(int index){
+        mesMessages.remove(index);
+    }
+
     public ArrayList<Message> getMesMessages() {
         return mesMessages;
     }
@@ -64,6 +68,8 @@ public class MessageRecycleAdapter extends RecyclerView.Adapter<MessageRecycleAd
         private TextView date;
         private TextView message;
         private ImageView imgprofil;
+        private int index;
+        private long id;
 
         public MessageHolder(View itemView){
             super(itemView);
@@ -74,6 +80,7 @@ public class MessageRecycleAdapter extends RecyclerView.Adapter<MessageRecycleAd
         }
 
         void bind(int listIndex){
+            index = listIndex;
             Message leMessage = mesMessages.get(listIndex);
             DateFormat dateFormater = new SimpleDateFormat("dd/MM/yyyy HH:mm");
             //Log.i("myTag",(new Date().getTime() - leMessage.getDate().getTime())+"");
@@ -87,6 +94,15 @@ public class MessageRecycleAdapter extends RecyclerView.Adapter<MessageRecycleAd
             date.setText(dateFormater.format(leMessage.getDate()));
             message.setText(leMessage.getMessage());
             imgprofil.setImageResource(R.mipmap.ic_launcher);
+            id = leMessage.getId();
+        }
+
+        public int getIndex(){
+            return index;
+        }
+
+        public long getId(){
+            return id;
         }
     }
 }
