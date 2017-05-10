@@ -20,6 +20,7 @@ import java.util.Date;
 public class MessageRecycleAdapter extends RecyclerView.Adapter<MessageRecycleAdapter.MessageHolder> {
 
     private ArrayList<Message> mesMessages;
+    private OnListItemClickListner itemClickListner;
 
     public MessageRecycleAdapter() {
         mesMessages = new ArrayList<>();
@@ -53,6 +54,10 @@ public class MessageRecycleAdapter extends RecyclerView.Adapter<MessageRecycleAd
         return viewHolder;
     }
 
+    public void setItemClickListner(OnListItemClickListner itemClickListner) {
+        this.itemClickListner = itemClickListner;
+    }
+
     @Override
     public void onBindViewHolder(MessageHolder holder, int position) {
         holder.bind(position);
@@ -63,12 +68,11 @@ public class MessageRecycleAdapter extends RecyclerView.Adapter<MessageRecycleAd
         return mesMessages.size();
     }
 
-    class MessageHolder extends RecyclerView.ViewHolder{
+    class MessageHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private TextView pseudo;
         private TextView date;
         private TextView message;
         private ImageView imgprofil;
-        private int index;
         private long id;
 
         public MessageHolder(View itemView){
@@ -77,10 +81,10 @@ public class MessageRecycleAdapter extends RecyclerView.Adapter<MessageRecycleAd
             date = (TextView) itemView.findViewById(R.id.date);
             message = (TextView) itemView.findViewById(R.id.message);
             imgprofil = (ImageView) itemView.findViewById(R.id.imgprofile);
+            itemView.setOnClickListener(this);
         }
 
         void bind(int listIndex){
-            index = listIndex;
             Message leMessage = mesMessages.get(listIndex);
             DateFormat dateFormater = new SimpleDateFormat("dd/MM/yyyy HH:mm");
             //Log.i("myTag",(new Date().getTime() - leMessage.getDate().getTime())+"");
@@ -98,11 +102,20 @@ public class MessageRecycleAdapter extends RecyclerView.Adapter<MessageRecycleAd
         }
 
         public int getIndex(){
-            return index;
+            return getAdapterPosition();
         }
 
         public long getId(){
             return id;
         }
+
+        @Override
+        public void onClick(View v) {
+            itemClickListner.onItemClick(getIndex(), mesMessages.get(getIndex()), v);
+        }
+    }
+
+    interface OnListItemClickListner{
+        void onItemClick(int indexOfItem, Message message, View v);
     }
 }

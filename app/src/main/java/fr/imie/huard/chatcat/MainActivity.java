@@ -10,7 +10,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -41,7 +43,6 @@ import static fr.imie.huard.chatcat.R.id.fab;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    //private CoordinatorLayout coordinatorLayout;
     //private RequestQueue queue = Volley.newRequestQueue(this);
     private MessageAdapter<Message> adapter;
     private ListView listView;
@@ -57,17 +58,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         editText = (EditText) findViewById(R.id.edit);
-
-        /*listView = (ListView) findViewById(R.id.list);
-        adapter = new MessageAdapter<Message>(this);
-
-        listView.setAdapter(adapter);*/
 
         listRecyclable = (RecyclerView) findViewById(R.id.list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -76,6 +70,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         listRecyclable.setHasFixedSize(false);
         adapterRecyclable = new MessageRecycleAdapter();
+        adapterRecyclable.setItemClickListner(new MessageRecycleAdapter.OnListItemClickListner() {
+            @Override
+            public void onItemClick(int indexOfItem, Message message, View v) {
+                final int index = indexOfItem;
+                final Message m = message;
+                v.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
+                    @Override
+                    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+                        MenuInflater inflater = getMenuInflater();
+                        inflater.inflate(R.menu.context_menu, menu);
+                        menu.findItem(R.id.context_delete).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                            @Override
+                            public boolean onMenuItemClick(MenuItem item) {
+                                //AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+                                adapterRecyclable.removeMessage(index);
+                                adapterRecyclable.notifyItemRemoved(index);
+                                deleteOneMessage(m.getId());
+                                return true;
+                            }
+                        });
+                    }
+                });
+                openContextMenu(v);
+            }
+        });
         listRecyclable.setAdapter(adapterRecyclable);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -145,11 +164,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (id) {
             case fab:
                 DateFormat dateFormater = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-                /*Uri contructionURI = Uri.parse("http://10.2.6.30:8080").buildUpon()
-                        .appendPath("ChatCat").appendPath("message")
-                        .appendQueryParameter("pseudo","Tim")
-                        .appendQueryParameter("date",dateFormater.format(new Date()))
-                        .appendQueryParameter("message",editText.getText().toString()).build();*/
                 Uri contructionURI = Uri.parse("http://10.2.6.30:8080").buildUpon()
                         .appendPath("ChatCat").appendPath("message").build();
 
@@ -159,8 +173,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 parametre.put("date", dateFormater.format(new Date()));
 
                 downloadNewPosts = new MethodTask(this, "POST", parametre);
-
-                //((MethodTask)downloadNewPosts).setParametre(parametre);
 
                 editText.setText("");
 
@@ -202,8 +214,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * permet de rechager la list
      */
     public void refresh(){
-        //adapter.clear();
-        //listView.setAdapter(adapter);
         adapterRecyclable.getMesMessages().clear();
         adapterRecyclable.notifyDataSetChanged();
         Uri contructionURI = Uri.parse("http://10.2.6.30:8080").buildUpon()
@@ -272,7 +282,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public static String  performPostCall(URL url, String method,
+    /**
+     * permet d'ajouter des parametres dans une URL
+     * @param url url du serveur
+     * @param method chaine de charactère pour selectionner la méthode
+     * <UL>
+     *  <LI>GET
+     *  <LI>POST
+     *  <LI>HEAD
+     *  <LI>OPTIONS
+     *  <LI>PUT
+     *  <LI>DELETE
+     *  <LI>TRACE
+     * </UL> sont légal
+     * @param postDataParams les parametres
+     * @return la reponse du serveur
+     */
+    public static String performPostCall(URL url, String method,
                                           HashMap<String, String> postDataParams) {
 
         //URL url;
