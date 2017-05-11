@@ -134,9 +134,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        /*Snackbar.make(coordinatorLayout, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show();*/
-
         //noinspection SimplifiableIfStatement
         switch (id){
             case R.id.action_settings:
