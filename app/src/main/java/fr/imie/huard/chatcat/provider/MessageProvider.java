@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import static com.android.volley.Request.Method.POST;
 import static fr.imie.huard.chatcat.provider.MessageCPContract.MessageEntry.TABLE_NAME;
 
 /**
@@ -51,7 +52,19 @@ public class MessageProvider extends ContentProvider {
     @Nullable
     @Override
     public String getType(@NonNull Uri uri) {
-        return null;
+        int match = sUriMatcher.match(uri);
+        switch (match) {
+            case MESSAGE:
+                // directory
+                return "vnd.android.cursor.dir" + "/" + MessageCPContract.AUTHORITY + "/" + MessageCPContract.PATH_MESSAGE;
+            case MESSAGE_WITH_ID:
+                // single item type
+                return "vnd.android.cursor.item" + "/" + MessageCPContract.AUTHORITY + "/" + MessageCPContract.PATH_MESSAGE;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+
+        }
+
     }
 
     @Nullable
@@ -80,16 +93,53 @@ public class MessageProvider extends ContentProvider {
 
     @Override
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
-        return 0;
+        final SQLiteDatabase db = mPostDbHelper.getWritableDatabase();
+
+        int match = sUriMatcher.match(uri);
+        int tasksDeleted; // starts as 0
+
+        switch (match) {
+            case MESSAGE_WITH_ID:
+                String id = uri.getPathSegments().get(1);
+                tasksDeleted = db.delete(TABLE_NAME, "_id=?", new String[]{id});
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+
+        if (tasksDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        // Return the number of tasks deleted
+        return tasksDeleted;
     }
 
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
-        return 0;
+        int postsUpdated;
+
+        int match = sUriMatcher.match(uri);
+
+        switch (match) {
+            case MESSAGE_WITH_ID:
+                //update a single task by getting the id
+                String id = uri.getPathSegments().get(1);
+                postsUpdated= mPostDbHelper.getWritableDatabase().update(TABLE_NAME, values, "_id=?", new String[]{id});
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+
+        if (postsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        // return number of tasks updated
+        return postsUpdated;
     }
 
     public static final int MESSAGE = 100;
-    public static final int POST_WITH_ID = 101;
+    public static final int MESSAGE_WITH_ID = 101;
 
     private static final UriMatcher sUriMatcher = buildURIMatcher();
 
